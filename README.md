@@ -17,6 +17,15 @@
 * **Licence :** Licence Ouverte Etalab 2.0
 * **Période couverte :** Pas de temps demi-heure, depuis janvier 2021
 
+## Membres de l'équipe :
+
+- Justin Bandiola
+- Douglas Pintero
+- Aymen Khlifi
+- David Daupin 
+- Maksen Benkerrou
+
+
 ## Installation
 Commandes pour créer l'environnement virtuel et installer les dépendances du projet :
 ```bash
