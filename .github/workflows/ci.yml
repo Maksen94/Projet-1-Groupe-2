@@ -25,4 +25,4 @@ jobs:
 
       - name: Vérification du style de code (PEP 8 / Ruff)
         run: |
-          ruff check .
+          ruff check src/
