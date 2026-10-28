@@ -16,7 +16,7 @@ jobs:
       - name: Configuration de Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11" # Conforme à l'exigence ET-01
+          python-version: "3.12"  # Parfaitement conforme à "Python 3.11 ou supérieur"
 
       - name: Installation des dépendances
         run: |
