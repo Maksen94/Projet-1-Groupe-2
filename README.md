@@ -25,3 +25,54 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 # Installation des dépendances :
 pip install -r requirements.txt
+
+## Installation
+Commandes pour créer l'environnement virtuel et installer les dépendances du projet (Python 3.11 ou version ultérieure requise) :
+
+```bash
+python -m venv .venv
+
+# Sous Windows (PowerShell) :
+.venv\Scripts\Activate.ps1
+# Sous macOS / Linux :
+source .venv/bin/activate
+
+# Installation des dépendances :
+pip install -r requirements.txt
+```
+
+## Récupération des données
+Le fichier de données (environ 450 Mo) dépasse la taille autorisée par GitHub : il n'est donc pas versionné, et le dossier `data/` est exclu par le `.gitignore`.
+
+Pour le télécharger, exécuter depuis la racine du projet :
+
+```bash
+python src/download.py
+```
+
+* **Fichier obtenu :** `data/raw/eco2mix-regional-cons-def.csv`
+* **Source :** [éCO2mix régional consolidé et définitif](https://odre.opendatasoft.com/explore/dataset/eco2mix-regional-cons-def/) – ODRE / RTE
+* **Format :** CSV, séparateur `;`, encodage UTF-8
+
+Si le fichier est déjà présent, le script ne le télécharge pas une seconde fois. Le téléchargement n'est à effectuer qu'une seule fois par poste : le fichier reste dans `data/raw/`, quelle que soit la branche active.
+
+### Chargement des données
+
+```python
+import pandas as pd
+
+df = pd.read_csv("data/raw/eco2mix-regional-cons-def.csv", sep=";")
+```
+
+Depuis un notebook du dossier `notebooks/`, utiliser le chemin relatif `../data/raw/eco2mix-regional-cons-def.csv`.
+
+### Travailler depuis une branche existante
+Si votre branche a été créée avant l'ajout du script, intégrez d'abord la dernière version de `main`, puis lancez le téléchargement :
+
+```bash
+git checkout <nom-de-votre-branche>
+git pull origin main
+python src/download.py
+```
+
+⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
