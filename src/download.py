@@ -23,8 +23,7 @@ def download(force: bool = False) -> Path:
     with requests.get(URL, stream=True, timeout=60) as response:
         response.raise_for_status()
         with open(CSV_PATH, "wb") as f:
-            for chunk in response.iter_content(chunk_size=1024 * 1024):
-                f.write(chunk)
+            f.writelines(response.iter_content(chunk_size=1024 * 1024))
 
     print(f"Fichier enregistré : {CSV_PATH}")
     return CSV_PATH
