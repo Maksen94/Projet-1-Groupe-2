@@ -16,6 +16,7 @@ __pycache__/
 # Données (téléchargées avec src/download.py, jamais versionnées)
 data/
 docs/*.csv
+*.csv
 
 # Fichiers système et éditeurs
 .DS_Store
