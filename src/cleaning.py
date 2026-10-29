@@ -31,7 +31,7 @@ DEFAULT_RAW = BASE_DIR / "data" / "raw" / "eco2mix-regional-cons-def.csv"
 FALLBACK_RAW = BASE_DIR / "eco2mix-regional-cons-def.csv"
 RAW_FILE = DEFAULT_RAW if DEFAULT_RAW.exists() else FALLBACK_RAW
 
-CLEAN_FILE = BASE_DIR / "eco2mix-regional-cons-def_clean.csv"
+CLEAN_FILE = BASE_DIR / "data" / "processed" / "eco2mix-regional-cons-def_clean.csv"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,12 +59,18 @@ FAKE_NULL_STRINGS = {
 
 # Colonnes non numeriques connues (tout le reste est considere numerique)
 NON_NUMERIC_COLS = {
+    "code insee région",
+    "code insee region",
     "code_insee_region",
+    "région",
+    "region",
     "libelle_region",
     "nature",
     "date",
     "heure",
+    "date - heure",
     "date_heure",
+    "dateheure",
 }
 
 # Colonnes physiques pouvant legitimement avoir des valeurs negatives
@@ -306,12 +312,19 @@ def quality_report(df: pd.DataFrame) -> None:
 # Pipeline principal
 # ---------------------------------------------------------------------------
 def clean_pipeline(
-    raw_path: str | Path = RAW_FILE,
-    clean_path: str | Path = CLEAN_FILE,
+    raw_path: str | Path | None = None,
+    clean_path: str | Path | None = None,
 ) -> pd.DataFrame:
     """Execute la totalite du pipeline de nettoyage et exporte le resultat."""
-    raw_path = Path(raw_path)
-    clean_path = Path(clean_path)
+    if raw_path is None:
+        raw_path = DEFAULT_RAW if DEFAULT_RAW.exists() else FALLBACK_RAW
+    else:
+        raw_path = Path(raw_path)
+
+    if clean_path is None:
+        clean_path = CLEAN_FILE
+    else:
+        clean_path = Path(clean_path)
 
     if not raw_path.exists():
         raise FileNotFoundError(
