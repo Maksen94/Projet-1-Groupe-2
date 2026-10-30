@@ -208,8 +208,12 @@ def filter_temporal_scope(
         return df
 
     n_before = len(df)
-    cutoff = pd.to_datetime(start_date)
-    df = df[df[col_date] >= cutoff].copy()
+    if pd.api.types.is_datetime64_any_dtype(df[col_date]):
+        mask = df[col_date] >= pd.to_datetime(start_date)
+    else:
+        mask = df[col_date].astype(str).str.strip() >= start_date
+
+    df = df[mask].copy()
     n_after = len(df)
     log.info(
         "Filtre temporel >= %s applique : %d lignes conservees (%d filtrees).",
@@ -217,6 +221,20 @@ def filter_temporal_scope(
         n_after,
         n_before - n_after,
     )
+    return df
+
+
+def cast_categories(df: pd.DataFrame) -> pd.DataFrame:
+    """Convertit les variables categorielles a faible cardinalite (optimisation RAM)."""
+    cat_candidates = [
+        c
+        for c in df.columns
+        if c.lower() in {"région", "region", "nature", "code insee région"}
+    ]
+    for col in cat_candidates:
+        df[col] = df[col].astype("category")
+    if cat_candidates:
+        log.info("Colonnes converties en category : %s", cat_candidates)
     return df
 
 
@@ -367,11 +385,12 @@ def clean_pipeline(
 
     df = load_raw(raw_path)
     df = drop_ghost_columns(df)
+    df = filter_temporal_scope(df, start_date="2021-01-01")
     df = clean_fake_nulls(df)
     df = cast_numeric(df)
     df = cast_dates(df)
-    df = filter_temporal_scope(df, start_date="2021-01-01")
     df = cast_code_insee(df)
+    df = cast_categories(df)
     df = flag_minus_one(df)
     df = remove_exact_duplicates(df)
     df = remove_functional_duplicates(df)
