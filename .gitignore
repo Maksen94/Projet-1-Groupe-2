@@ -1,24 +1,42 @@
-# Environnement virtuel
-.venv/
-venv/
+# Données (exigence GIT-04 : aucune donnée brute versionnée)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.zip
+*.tar.gz
+eco2mix-regional-cons-def.csv
 
-# Python
+# Fichiers compilés et cache Python
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Jupyter
+# Environnements virtuels
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
 
 # Secrets
 .env
 .streamlit/secrets.toml
 
-# Données (téléchargées avec src/download.py, jamais versionnées)
-data/
-docs/*.csv
-
-# Fichiers système et éditeurs
+# macOS & Système
 .DS_Store
+.AppleDouble
+.LSOverride
 Thumbs.db
-.vscode/
+
+# IDEs
 .idea/
+.vscode/
+*.swp
+*.swo
