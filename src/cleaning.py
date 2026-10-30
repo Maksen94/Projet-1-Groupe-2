@@ -6,10 +6,11 @@ Operations effectuees :
   3. Remplacement des valeurs manquantes deguisees (chaines vides, "nan", "nr", etc.)
   4. Conversion des types (25 metriques numeriques en float, separateur decimal)
   5. Conversion des dates (date, heure, date_heure tz-aware Europe/Paris)
-  6. Normalisation du code INSEE region
-  7. Traitement des valeurs -1 d'absence pour filieres strictement non negatives
-  8. Suppression des doublons exacts et fonctionnels (meme region x meme creneau)
-  9. Rapport qualite post-nettoyage et export CSV
+  6. Filtrage temporel >= 2021-01-01 (perimetre officiel Annexe A.7)
+  7. Normalisation du code INSEE region
+  8. Traitement des valeurs -1 d'absence pour filieres strictement non negatives
+  9. Suppression des doublons exacts et fonctionnels (meme region x meme creneau)
+  10. Rapport qualite post-nettoyage et export en double format (Parquet et CSV)
 
 Usage :
     python src/cleaning.py
@@ -32,6 +33,9 @@ FALLBACK_RAW = BASE_DIR / "eco2mix-regional-cons-def.csv"
 RAW_FILE = DEFAULT_RAW if DEFAULT_RAW.exists() else FALLBACK_RAW
 
 CLEAN_FILE = BASE_DIR / "data" / "processed" / "eco2mix-regional-cons-def_clean.csv"
+CLEAN_PARQUET = (
+    BASE_DIR / "data" / "processed" / "eco2mix-regional-cons-def_clean.parquet"
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,7 +100,7 @@ def load_raw(path: str | Path) -> pd.DataFrame:
         dtype=str,  # tout en str pour detection fine des valeurs deguisees
     )
     # Nettoyage des noms de colonnes (espaces et BOM eventuel)
-    df.columns = df.columns.str.replace(r"^\ufeff", "", regex=True).str.strip()
+    df.columns = [str(c).lstrip("\ufeff").strip() for c in df.columns]
     log.info("Fichier charge : %d lignes x %d colonnes", *df.shape)
     return df
 
@@ -190,6 +194,29 @@ def cast_dates(df: pd.DataFrame) -> pd.DataFrame:
             col_dh,
         )
 
+    return df
+
+
+def filter_temporal_scope(
+    df: pd.DataFrame, start_date: str = "2021-01-01"
+) -> pd.DataFrame:
+    """Filtre le perimetre temporel a partir du 01/01/2021 (Annexe A.7)."""
+    col_map = {c.lower(): c for c in df.columns}
+    col_date = col_map.get("date")
+    if not col_date:
+        log.warning("Colonne 'Date' introuvable pour le filtrage temporel.")
+        return df
+
+    n_before = len(df)
+    cutoff = pd.to_datetime(start_date)
+    df = df[df[col_date] >= cutoff].copy()
+    n_after = len(df)
+    log.info(
+        "Filtre temporel >= %s applique : %d lignes conservees (%d filtrees).",
+        start_date,
+        n_after,
+        n_before - n_after,
+    )
     return df
 
 
@@ -314,8 +341,9 @@ def quality_report(df: pd.DataFrame) -> None:
 def clean_pipeline(
     raw_path: str | Path | None = None,
     clean_path: str | Path | None = None,
+    parquet_path: str | Path | None = None,
 ) -> pd.DataFrame:
-    """Execute la totalite du pipeline de nettoyage et exporte le resultat."""
+    """Execute la totalite du pipeline de nettoyage et exporte en Parquet et CSV."""
     if raw_path is None:
         raw_path = DEFAULT_RAW if DEFAULT_RAW.exists() else FALLBACK_RAW
     else:
@@ -325,6 +353,11 @@ def clean_pipeline(
         clean_path = CLEAN_FILE
     else:
         clean_path = Path(clean_path)
+
+    if parquet_path is None:
+        parquet_path = CLEAN_PARQUET
+    else:
+        parquet_path = Path(parquet_path)
 
     if not raw_path.exists():
         raise FileNotFoundError(
@@ -337,23 +370,38 @@ def clean_pipeline(
     df = clean_fake_nulls(df)
     df = cast_numeric(df)
     df = cast_dates(df)
+    df = filter_temporal_scope(df, start_date="2021-01-01")
     df = cast_code_insee(df)
     df = flag_minus_one(df)
     df = remove_exact_duplicates(df)
     df = remove_functional_duplicates(df)
     quality_report(df)
 
+    # 1. Export Parquet haute performance (ET-05)
+    parquet_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_parquet = parquet_path.with_suffix(".parquet.tmp")
+    log.info("Export Parquet -> %s", parquet_path)
+    df.to_parquet(tmp_parquet, index=False, engine="pyarrow")
+    if parquet_path.exists():
+        try:
+            parquet_path.unlink()
+        except OSError:
+            pass
+    tmp_parquet.replace(parquet_path)
+
+    # 2. Export CSV pour retrocompatibilite
     clean_path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = clean_path.with_suffix(".csv.tmp")
-    log.info("Export -> %s", clean_path)
-    df.to_csv(tmp_path, sep=";", index=False, encoding="utf-8-sig")
+    tmp_csv = clean_path.with_suffix(".csv.tmp")
+    log.info("Export CSV -> %s", clean_path)
+    df.to_csv(tmp_csv, sep=";", index=False, encoding="utf-8-sig")
     if clean_path.exists():
         try:
             clean_path.unlink()
         except OSError:
             pass
-    tmp_path.replace(clean_path)
-    log.info("Export termine avec succes.")
+    tmp_csv.replace(clean_path)
+
+    log.info("Exports Parquet et CSV termines avec succes.")
     return df
 
 
