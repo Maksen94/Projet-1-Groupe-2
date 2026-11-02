@@ -16,6 +16,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
 # Environnements virtuels
 .venv/
 venv/
@@ -25,10 +26,17 @@ env/
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
 
-# macOS
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# macOS & Système
 .DS_Store
 .AppleDouble
 .LSOverride
+Thumbs.db
+
 
 # IDEs
 .idea/
