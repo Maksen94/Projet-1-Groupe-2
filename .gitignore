@@ -16,6 +16,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
 # Environnements virtuels
 .venv/
 venv/
@@ -24,6 +25,7 @@ env/
 
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
+
 
 # Secrets
 .env
@@ -34,6 +36,7 @@ env/
 .AppleDouble
 .LSOverride
 Thumbs.db
+
 
 # IDEs
 .idea/
