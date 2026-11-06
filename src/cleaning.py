@@ -85,6 +85,54 @@ LEGIT_NEGATIVE_COLS = {
     "ech. physiques (mw)",
 }
 
+# Mapping de normalisation des intitules techniques (API ODRE) vers libelles officiels
+COLUMN_RENAME_MAP = {
+    "code_insee_region": "Code INSEE région",
+    "libelle_region": "Région",
+    "nature": "Nature",
+    "date": "Date",
+    "heure": "Heure",
+    "date_heure": "Date - Heure",
+    "consommation": "Consommation (MW)",
+    "thermique": "Thermique (MW)",
+    "nucleaire": "Nucléaire (MW)",
+    "eolien": "Eolien (MW)",
+    "solaire": "Solaire (MW)",
+    "hydraulique": "Hydraulique (MW)",
+    "pompage": "Pompage (MW)",
+    "bioenergies": "Bioénergies (MW)",
+    "ech_physiques": "Ech. physiques (MW)",
+    "stockage_batterie": "Stockage batterie",
+    "destockage_batterie": "Déstockage batterie",
+    "eolien_terrestre": "Eolien terrestre",
+    "eolien_offshore": "Eolien offshore",
+    "tco_thermique": "TCO Thermique (%)",
+    "tch_thermique": "TCH Thermique (%)",
+    "tco_nucleaire": "TCO Nucléaire (%)",
+    "tch_nucleaire": "TCH Nucléaire (%)",
+    "tco_eolien": "TCO Eolien (%)",
+    "tch_eolien": "TCH Eolien (%)",
+    "tco_solaire": "TCO Solaire (%)",
+    "tch_solaire": "TCH Solaire (%)",
+    "tco_hydraulique": "TCO Hydraulique (%)",
+    "tch_hydraulique": "TCH Hydraulique (%)",
+    "tco_bioenergies": "TCO Bioénergies (%)",
+    "tch_bioenergies": "TCH Bioénergies (%)",
+}
+
+
+def standardize_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise les noms techniques de colonnes en libelles officiels eco2mix."""
+    renamed = {
+        c: COLUMN_RENAME_MAP[c.lower()]
+        for c in df.columns
+        if c.lower() in COLUMN_RENAME_MAP and c != COLUMN_RENAME_MAP[c.lower()]
+    }
+    if renamed:
+        df = df.rename(columns=renamed)
+        log.info("Colonnes standardisees vers libelles officiels : %d", len(renamed))
+    return df
+
 
 # ---------------------------------------------------------------------------
 # 1. Chargement
@@ -385,6 +433,7 @@ def clean_pipeline(
 
     df = load_raw(raw_path)
     df = drop_ghost_columns(df)
+    df = standardize_column_names(df)
     df = filter_temporal_scope(df, start_date="2021-01-01")
     df = clean_fake_nulls(df)
     df = cast_numeric(df)
