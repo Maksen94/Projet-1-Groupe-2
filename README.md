@@ -85,3 +85,4 @@ python src/download.py
 ```
 
 ⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
+⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
