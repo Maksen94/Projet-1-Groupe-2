@@ -17,6 +17,15 @@
 * **Licence :** Licence Ouverte Etalab 2.0
 * **Période couverte :** Pas de temps demi-heure, depuis janvier 2021
 
+## Membres de l'équipe :
+
+- Justin Bandiola
+- Douglas Pintero
+- Aymen Khlifi
+- David Daupin 
+- Maksen Benkerrou
+
+
 ## Installation
 Commandes pour créer l'environnement virtuel et installer les dépendances du projet :
 ```bash
@@ -75,4 +84,5 @@ git pull origin main
 python src/download.py
 ```
 
+⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
 ⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
