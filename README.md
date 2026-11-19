@@ -17,23 +17,13 @@
 * **Licence :** Licence Ouverte Etalab 2.0
 * **Période couverte :** Pas de temps demi-heure, depuis janvier 2021
 
-## Membres de l'équipe :
+## Membres de l'équipe
 
-- Justin Bandiola
-- Douglas Pintero
-- Aymen Khlifi
-- David Daupin 
-- Maksen Benkerrou
-
-
-## Installation
-Commandes pour créer l'environnement virtuel et installer les dépendances du projet :
-```bash
-python -m venv .venv
-# Sur Windows (PowerShell) :
-.venv\Scripts\Activate.ps1
-# Installation des dépendances :
-pip install -r requirements.txt
+- **Justin Bandiola** ([@Justinbnda](https://github.com/Justinbnda)) – Responsable Qualité / CI / Synthèse
+- **Douglas Quintero** ([@sgDfQ](https://github.com/sgDfQ)) – Tableau de bord Streamlit & Visualisation
+- **Aymen Khlifi** ([@AkhyRider](https://github.com/AkhyRider)) – Pipeline de nettoyage des données (Data Cleaning)
+- **David Daupin** ([@DaupinDavid](https://github.com/DaupinDavid)) – Analyse exploratoire des données
+- **Maksen Benkerrou** ([@Maksen94](https://github.com/Maksen94)) – Données INSEE & Consommation par habitant
 
 ## Installation
 Commandes pour créer l'environnement virtuel et installer les dépendances du projet (Python 3.11 ou version ultérieure requise) :
@@ -84,5 +74,4 @@ git pull origin main
 python src/download.py
 ```
 
-⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
 ⚠️ Ne téléchargez pas le fichier sur une branche qui ne contient pas encore le nouveau `.gitignore` : un `git add .` l'ajouterait au commit, et le push serait rejeté par GitHub (limite de 100 Mo par fichier).
